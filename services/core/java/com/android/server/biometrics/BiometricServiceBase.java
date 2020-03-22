@@ -841,7 +841,11 @@ public abstract class BiometricServiceBase extends SystemService
             ClientMonitor client = mCurrentClient;
             if (client instanceof EnrollClient && client.getToken() == token) {
                 if (DEBUG) Slog.v(getTag(), "Cancelling enrollment");
-                client.stop(client.getToken() == token);
+                final int stopResult = client.stop(true);
+                if (mNotifyClient && (stopResult == 0)) {
+                    handleError(mHalDeviceId,
+                            BiometricConstants.BIOMETRIC_ERROR_CANCELED, 0);
+                }
             }
         });
     }
